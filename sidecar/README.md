@@ -8,7 +8,7 @@
 ## Build instructions
 
 	go get 
-        go build .
+	go build .
     
     
 ## edit cfg.ini or write up a new one
