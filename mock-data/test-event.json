@@ -1,0 +1,22 @@
+{
+  "id": "Y2lzY29zcGFyazovL3VzL1dFQkhPT0svOTIyYjcyZDUtNzFlMi00ZTEyLThmODAtYTVmMGQzNmQwZmM2",
+  "name": "Teams Relay",
+  "targetUrl": "https://requestinspector.com/inspect/01dv41vb29wzd4pwxbbkrzdcmd",
+  "resource": "attachmentActions",
+  "event": "created",
+  "orgId": "Y2lzY29zcGFyazovL3VzL09SR0FOSVpBVElPTi8xZWI2NWZkZi05NjQzLTQxN2YtOTk3NC1hZDcyY2FlMGUxMGY",
+  "createdBy": "Y2lzY29zcGFyazovL3VzL1BFT1BMRS83ZTAxYzRlNS02ZDQ1LTRiOTUtYWFjYS02MDFjMzg5NzQyZTg",
+  "appId": "Y2lzY29zcGFyazovL3VzL0FQUExJQ0FUSU9OL0NmMzkyNWU5NDFmMzhhYTc0M2Y0MmFiNzcwZmZhZjFhNTIyMjcxZDI5OTQ4NDhjNjk2YWMwYTEwN2Q2YTg5MjI3",
+  "ownedBy": "creator",
+  "status": "active",
+  "created": "2019-12-02T21:57:34.540Z",
+  "actorId": "Y2lzY29zcGFyazovL3VzL1BFT1BMRS83ZTAxYzRlNS02ZDQ1LTRiOTUtYWFjYS02MDFjMzg5NzQyZTg",
+  "data": {
+    "id": "Y2lzY29zcGFyazovL3VzL0FUVEFDSE1FTlRfQUNUSU9OLzIyMWRjNWEwLTE1NjgtMTFlYS1hZWZhLTUxZWU2ODU0N2EyZA",
+    "type": "submit",
+    "messageId": "Y2lzY29zcGFyazovL3VzL01FU1NBR0UvZjEwZTZjNTAtMTU1MS0xMWVhLWI5YjctNTU3MjYxMjQ3NDMz",
+    "personId": "Y2lzY29zcGFyazovL3VzL1BFT1BMRS83ZTAxYzRlNS02ZDQ1LTRiOTUtYWFjYS02MDFjMzg5NzQyZTg",
+    "roomId": "Y2lzY29zcGFyazovL3VzL1JPT00vZTA1YTMzYzAtMGQ2NC0xMWVhLWFkMGEtMGZlNDNhM2UwZTYw",
+    "created": "2019-12-02T22:20:37.075Z"
+  }
+}

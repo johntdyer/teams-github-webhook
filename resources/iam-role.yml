@@ -1,0 +1,75 @@
+Resources:
+  TeamsRelayRole:
+    Type: AWS::IAM::Role
+    Properties:
+
+      RoleName: TeamsRelayRole # required if you want to use 'serverless deploy --function' later on
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      # note that these rights are needed if you want your function to be able to communicate with resources within your vpc
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+      Policies:
+
+        - PolicyName: allowXray
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "xray:PutTraceSegments"
+                  - "xray:PutTelemetryRecords"
+                Resource:
+                  - "*"
+        - PolicyName: sqsQueueServlessPolicy # myPolicyName
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                -  sns:TagResource
+                -  sns:Publish
+                Resource: arn:aws:sns:*:*:*
+                Effect: Allow
+
+              - Action:
+                - sqs:ChangeMessageVisibility
+                - sqs:ChangeMessageVisibilityBatch
+                - sqs:DeleteQueue
+                - sqs:PurgeQueue
+                - sqs:SendMessage
+                - sqs:SendMessageBatch
+                - sqs:SetQueueAttributes
+                Effect: Allow
+                Resource: arn:aws:sqs:*:*:*
+              - Action: sqs:ListQueues
+                Effect: Allow
+                Resource: '*'
+                Sid: VisualEditor0
+              - Effect: Allow # note that these rights are given in the default policy and are required if you want logs out of your lambda(s)
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - 'Fn::Join':
+                    - ':'
+                    -
+                      - 'arn:aws:logs'
+                      - Ref: 'AWS::Region'
+                      - Ref: 'AWS::AccountId'
+                      - 'log-group:/aws/lambda/*:*:*'
+              - Effect: "Allow"
+                Action:
+                  - "s3:PutObject"
+                Resource:
+                  Fn::Join:
+                    - ""
+                    - - "arn:aws:s3:::"
+                      - "Ref" : "ServerlessDeploymentBucket"
+

@@ -1,0 +1,440 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "The AWS CloudFormation template for this Serverless application",
+  "Resources": {
+    "ServerlessDeploymentBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "AuthorizeLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/teams-relay-dev-authorize"
+      }
+    },
+    "GenericUnderscorehttpUnderscoreeventsUnderscoreprocessorLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/teams-relay-dev-generic_http_events_processor"
+      }
+    },
+    "AuthorizeLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/teams-relay/dev/1575343317576-2019-12-03T03:21:57.576Z/teams-relay.zip"
+        },
+        "FunctionName": "teams-relay-dev-authorize",
+        "Handler": "bin/auth",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "TeamsRelayRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "go1.x",
+        "Timeout": 6,
+        "TracingConfig": {
+          "Mode": "Active"
+        },
+        "Environment": {
+          "Variables": {
+            "TARGET_SQS_QUEUE": "teams-relay-dev.fifo",
+            "SQS_FIFO_QUEUE_ENABLED": true,
+            "ACCOUNT_ID": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "AWS::AccountId"
+                  },
+                  ""
+                ]
+              ]
+            },
+            "HTTP_WEBHOOK_SECRET": "Cisco1234",
+            "BASIC_AUTH_USERNAME": "admin",
+            "BASIC_AUTH_PASSWORD": "Cisco1234",
+            "TEAMS_BEARER_TOKEN": "NmE4MTk0YTQtMjFkZC00MWQ3LWEzOWEtYmZmYWIwYzk3ZTZhOGQxN2ZhODQtNjJh_PF84_1eb65fdf-9643-417f-9974-ad72cae0e10f"
+          }
+        }
+      },
+      "DependsOn": [
+        "AuthorizeLogGroup",
+        "TeamsRelayRole"
+      ]
+    },
+    "AuthorizeLambdaVersionLKfiWg8Dkm3Z56i7I2ZcBPj5DIUboI0HS2m936k": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "AuthorizeLambdaFunction"
+        },
+        "CodeSha256": "I0dTfPJcKZShZfuQpw7MDLAcDkImAshhenI+NVj0rek="
+      }
+    },
+    "GenericUnderscorehttpUnderscoreeventsUnderscoreprocessorLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/teams-relay/dev/1575343317576-2019-12-03T03:21:57.576Z/teams-relay.zip"
+        },
+        "FunctionName": "teams-relay-dev-generic_http_events_processor",
+        "Handler": "bin/generic_http_events_processor",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "TeamsRelayRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "go1.x",
+        "Timeout": 6,
+        "TracingConfig": {
+          "Mode": "Active"
+        },
+        "Environment": {
+          "Variables": {
+            "TARGET_SQS_QUEUE": "teams-relay-dev.fifo",
+            "SQS_FIFO_QUEUE_ENABLED": true,
+            "ACCOUNT_ID": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "AWS::AccountId"
+                  },
+                  ""
+                ]
+              ]
+            },
+            "HTTP_WEBHOOK_SECRET": "Cisco1234",
+            "BASIC_AUTH_USERNAME": "admin",
+            "BASIC_AUTH_PASSWORD": "Cisco1234",
+            "TEAMS_BEARER_TOKEN": "NmE4MTk0YTQtMjFkZC00MWQ3LWEzOWEtYmZmYWIwYzk3ZTZhOGQxN2ZhODQtNjJh_PF84_1eb65fdf-9643-417f-9974-ad72cae0e10f"
+          }
+        }
+      },
+      "DependsOn": [
+        "GenericUnderscorehttpUnderscoreeventsUnderscoreprocessorLogGroup",
+        "TeamsRelayRole"
+      ]
+    },
+    "GenericUnderscorehttpUnderscoreeventsUnderscoreprocessorLambdaVersionxBprnXz8o4V97CTI5Hl6tDes9Fwgd6CvRaucXOYe3s": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "GenericUnderscorehttpUnderscoreeventsUnderscoreprocessorLambdaFunction"
+        },
+        "CodeSha256": "I0dTfPJcKZShZfuQpw7MDLAcDkImAshhenI+NVj0rek="
+      }
+    },
+    "ApiGatewayRestApi": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Name": "dev-teams-relay",
+        "EndpointConfiguration": {
+          "Types": [
+            "EDGE"
+          ]
+        }
+      }
+    },
+    "ApiGatewayResourceGeneric": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "generic",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayMethodGenericPost": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "POST",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceGeneric"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "GenericUnderscorehttpUnderscoreeventsUnderscoreprocessorLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      }
+    },
+    "ApiGatewayDeployment1575343314833": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "StageName": "dev"
+      },
+      "DependsOn": [
+        "ApiGatewayMethodGenericPost"
+      ]
+    },
+    "GenericUnderscorehttpUnderscoreeventsUnderscoreprocessorLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "GenericUnderscorehttpUnderscoreeventsUnderscoreprocessorLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "TeamsRelayRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": "TeamsRelayRole",
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+        ],
+        "Policies": [
+          {
+            "PolicyName": "allowXray",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "xray:PutTraceSegments",
+                    "xray:PutTelemetryRecords"
+                  ],
+                  "Resource": [
+                    "*"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "sqsQueueServlessPolicy",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Action": [
+                    "sns:TagResource",
+                    "sns:Publish"
+                  ],
+                  "Resource": "arn:aws:sns:*:*:*",
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": [
+                    "sqs:ChangeMessageVisibility",
+                    "sqs:ChangeMessageVisibilityBatch",
+                    "sqs:DeleteQueue",
+                    "sqs:PurgeQueue",
+                    "sqs:SendMessage",
+                    "sqs:SendMessageBatch",
+                    "sqs:SetQueueAttributes"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "arn:aws:sqs:*:*:*"
+                },
+                {
+                  "Action": "sqs:ListQueues",
+                  "Effect": "Allow",
+                  "Resource": "*",
+                  "Sid": "VisualEditor0"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        ":",
+                        [
+                          "arn:aws:logs",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          {
+                            "Ref": "AWS::AccountId"
+                          },
+                          "log-group:/aws/lambda/*:*:*"
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:PutObject"
+                  ],
+                  "Resource": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:aws:s3:::",
+                        {
+                          "Ref": "ServerlessDeploymentBucket"
+                        }
+                      ]
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "TeamsRelayQueue": {
+      "Type": "AWS::SQS::Queue",
+      "Properties": {
+        "FifoQueue": true,
+        "ContentBasedDeduplication": true,
+        "QueueName": "teams-relay-dev.fifo"
+      }
+    }
+  },
+  "Outputs": {
+    "ServerlessDeploymentBucketName": {
+      "Value": {
+        "Ref": "ServerlessDeploymentBucket"
+      }
+    },
+    "AuthorizeLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "AuthorizeLambdaVersionLKfiWg8Dkm3Z56i7I2ZcBPj5DIUboI0HS2m936k"
+      }
+    },
+    "GenericUnderscorehttpUnderscoreeventsUnderscoreprocessorLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "GenericUnderscorehttpUnderscoreeventsUnderscoreprocessorLambdaVersionxBprnXz8o4V97CTI5Hl6tDes9Fwgd6CvRaucXOYe3s"
+      }
+    },
+    "ServiceEndpoint": {
+      "Description": "URL of the service endpoint",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Ref": "ApiGatewayRestApi"
+            },
+            ".execute-api.",
+            {
+              "Ref": "AWS::Region"
+            },
+            ".",
+            {
+              "Ref": "AWS::URLSuffix"
+            },
+            "/dev"
+          ]
+        ]
+      }
+    }
+  }
+}

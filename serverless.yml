@@ -1,0 +1,50 @@
+service: teams-relay
+
+frameworkVersion: '>=1.28.0 <2.0.0'
+
+provider:
+  name: aws
+  runtime: go1.x
+
+  region: us-east-2
+
+  role: TeamsRelayRole   # must validly reference a role defined in the service
+  memorySize: 128 # optional, in MB, default is 1024
+  tracing:
+    apiGateway: true
+    lambda: true
+
+  environment:
+    # TARGET_SQS_QUEUE: ${self:service}-${self:provider.stage}-first-queue.fifo
+    TARGET_SQS_QUEUE: ${self:service}-${self:provider.stage}.fifo
+    SQS_FIFO_QUEUE_ENABLED: true
+    ACCOUNT_ID:  { "Fn::Join" : ["", [{ "Ref" : "AWS::AccountId" }, "" ]] }
+    HTTP_WEBHOOK_SECRET: ${ssm:/teams/webhook/teams_secret~true}
+    BASIC_AUTH_USERNAME: ${ssm:/teams/webhook/basicauth/username~true}
+    BASIC_AUTH_PASSWORD: ${ssm:/teams/webhook/basicauth/password~true}
+    TEAMS_BEARER_TOKEN: ${ssm:/teams/webhook/bearer_token~true}
+
+package:
+  exclude:
+    - ./**
+  include:
+    - ./bin/**
+
+functions:
+  #### Authorizaation function
+  authorize:
+    handler: bin/auth
+
+  generic_http_events_processor:
+    handler: bin/generic_http_events_processor
+    events:
+      - http:
+          path: generic
+          method: post
+          # authorizer:
+          #   name: authorize
+          #   resultTtlInSeconds: 0
+
+resources:
+  - ${file(./resources/iam-role.yml)}
+  - ${file(./resources/sns-sqs.yml)}

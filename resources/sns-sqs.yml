@@ -1,0 +1,7 @@
+Resources:
+  TeamsRelayQueue:
+    Type: "AWS::SQS::Queue"
+    Properties:
+      FifoQueue: true
+      ContentBasedDeduplication: true
+      QueueName: ${self:service}-${self:provider.stage}.fifo
